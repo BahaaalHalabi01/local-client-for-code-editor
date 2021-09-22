@@ -73,19 +73,20 @@ const cellsSlice = createSlice({
         //find target index to be moved to
         const targetIndex: number = direction === 'up' ? index - 1 : index + 1
         //check if index out of bound and return
+        console.log(targetIndex)
         if (targetIndex < 0 || targetIndex > state.data.length - 1) return state
         //switch based on direction
         switch (direction) {
           case 'up': {
-            let temp = state.data[index - 1]
-            state.data[index - 1] = state.data[index]
+            let temp = state.data[targetIndex]
+            state.data[targetIndex] = state.data[index]
             state.data[index] = temp
             return state
           }
           case 'down': {
-            let temp = state.data[index]
-            state.data[index] = state.data[index - 1]
-            state.data[index - 1] = temp
+            let temp = state.data[targetIndex]
+            state.data[targetIndex] = state.data[index]
+            state.data[index] = temp
             return state
           }
           default:
