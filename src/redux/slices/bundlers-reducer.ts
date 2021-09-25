@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import bundle from '../../bundler'
-import { createAsyncThunk } from '@reduxjs/toolkit'
+import { createBundle } from './async-thunk'
 
 export type BundlesState = {
   [key: string]:
@@ -11,23 +10,6 @@ export type BundlesState = {
       }
     | undefined
 }
-
-interface UserData {
-  id: string
-  code: string
-}
-
-export const createBundle = createAsyncThunk(
-  'bundles',
-  async (input: UserData) => {
-    const { code, id } = input
-    const response = await bundle(code)
-    return {
-      ...response,
-      id,
-    }
-  }
-)
 
 const initialState: BundlesState = {}
 

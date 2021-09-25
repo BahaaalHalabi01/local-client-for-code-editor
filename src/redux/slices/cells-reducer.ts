@@ -1,5 +1,6 @@
 import { createSlice, nanoid, PayloadAction } from '@reduxjs/toolkit'
 import { CellTypes, Cell } from '../cell'
+import { fetchCells } from './async-thunk'
 
 type Direction = 'up' | 'down'
 
@@ -130,6 +131,7 @@ const cellsSlice = createSlice({
         //find the cell
         const index = findIndex(state.data, action.payload.id)
         state.data[index].data = action.payload.data
+        return state
       },
       prepare: (id: string, data: string) => {
         return {
@@ -141,7 +143,35 @@ const cellsSlice = createSlice({
       },
     },
   },
+  extraReducers: builder => {
+    builder
+      .addCase(fetchCells.pending, (state, action) => {
+        state.loading = true
+        state.error = null
+        console.log(action)
+        return state
+
+        //loading
+      })
+      .addCase(fetchCells.fulfilled, (state, action) => {
+        state.data = action.payload.data
+        console.log(action.payload)
+        return state
+
+        //cells fetched succesfully
+      })
+      .addCase(fetchCells.rejected, (state, action) => {
+        //error occured
+        state.loading = false
+        state.error = action.error.toString()
+        console.log(action.error)
+        return state
+      })
+  },
 })
+
+//Fetchcomplete payload: Cell[]
+//Fetcherror payload: string
 
 export const { insertCell, moveCell, deleteCell, updateCell } =
   cellsSlice.actions
@@ -151,6 +181,7 @@ export const cellActionCreators = {
   moveCell,
   updateCell,
   deleteCell,
+  fetchCells,
 }
 
 export default cellsSlice.reducer
