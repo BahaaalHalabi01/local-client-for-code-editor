@@ -1,7 +1,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import bundle from '../../bundler'
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 import { Cell } from '../cell'
+import { RootState } from './index'
 
 interface UserData {
   id: string
@@ -21,20 +22,30 @@ export const createBundle = createAsyncThunk(
 )
 
 export const fetchCells = createAsyncThunk(
-  'cells',
+  'cells/fetch',
   async (input, { rejectWithValue }) => {
     try {
-      const { data }: { data: Cell[] } = await axios.get('/cells')
-      return {
-        data,
-      }
+      const response = await axios.get('/cells')
+      const data: Cell[] = response.data
+      return data
     } catch (error: any) {
-      let err: AxiosError<{ message: string }> = error
-
-      if (!err.response) {
-        throw err
-      }
-      return rejectWithValue(err.response)
+      return rejectWithValue(error.response)
     }
   }
 )
+
+export const saveCells = createAsyncThunk<
+  void,
+  void,
+  { state: RootState; rejectValue: string }
+>('cells/save', async (input, { getState, rejectWithValue }) => {
+  try {
+    const { cells } = getState()
+    await axios.post('/cells', cells.data)
+  } catch (error: any) {
+    if (!error.response.data) {
+      throw error
+    }
+    rejectWithValue(error.response.data)
+  }
+})

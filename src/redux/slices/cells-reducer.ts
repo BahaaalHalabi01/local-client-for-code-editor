@@ -1,6 +1,6 @@
 import { createSlice, nanoid, PayloadAction } from '@reduxjs/toolkit'
 import { CellTypes, Cell } from '../cell'
-import { fetchCells } from './async-thunk'
+import { fetchCells, saveCells } from './async-thunk'
 
 type Direction = 'up' | 'down'
 
@@ -18,6 +18,7 @@ const initialState: CellsState = {
 
 //helper function for index finding
 const findIndex = (data: Cell[], id: string | null): number => {
+  if (id === null) return -1
   return data.findIndex(item => item.id === id)
 }
 
@@ -39,6 +40,7 @@ const cellsSlice = createSlice({
           id: nanoid().substr(2, 4),
         }
         //Find Insert Index ( always insert before )
+
         const index = findIndex(state.data, action.payload.id)
         //Index doesnt exist add at the start
         if (index < 0) {
@@ -146,32 +148,25 @@ const cellsSlice = createSlice({
   extraReducers: builder => {
     builder
       .addCase(fetchCells.pending, (state, action) => {
-        state.loading = true
-        state.error = null
-        console.log(action)
-        return state
-
         //loading
       })
       .addCase(fetchCells.fulfilled, (state, action) => {
-        state.data = action.payload.data
-        console.log(action.payload)
-        return state
-
+        // state.data = action.payload
         //cells fetched succesfully
       })
       .addCase(fetchCells.rejected, (state, action) => {
         //error occured
-        state.loading = false
+
         state.error = action.error.toString()
-        console.log(action.error)
+      })
+      .addCase(saveCells.pending, (state, action) => {
+        return state
+      })
+      .addCase(saveCells.rejected, (state, action) => {
         return state
       })
   },
 })
-
-//Fetchcomplete payload: Cell[]
-//Fetcherror payload: string
 
 export const { insertCell, moveCell, deleteCell, updateCell } =
   cellsSlice.actions
@@ -182,6 +177,7 @@ export const cellActionCreators = {
   updateCell,
   deleteCell,
   fetchCells,
+  saveCells,
 }
 
 export default cellsSlice.reducer

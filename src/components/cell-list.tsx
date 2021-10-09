@@ -1,11 +1,23 @@
-import { Fragment } from 'react'
+import { Fragment, useEffect, useRef } from 'react'
 import { useSelector } from '../hooks/use-typed-selector'
+import { useActions } from '../hooks/use-actions'
 import CellListItem from './cell-list-item'
 import AddCell from './add-cell'
 import './css/cell-list.css'
 
 const CellList: React.FC = () => {
+  const { fetchCells, saveCells } = useActions()
   const { data } = useSelector(state => state.cells)
+  const fetchRef = useRef(fetchCells)
+  const saveRef = useRef(saveCells)
+
+  useEffect(() => {
+    fetchRef.current()
+  }, [])
+
+  useEffect(() => {
+    saveRef.current()
+  }, [])
 
   let renderedCells
 
